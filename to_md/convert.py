@@ -41,12 +41,14 @@ if __name__ == "__main__":
         for item in data:
             if item["categories"][0] == cate:
                 # Safely access AI fields with default values
+                # Truy cập an toàn các trường AI với các giá trị mặc định
                 ai_data = item.get('AI', {})
                 if not ai_data or not isinstance(ai_data, dict):
                     print(f"Skipping item '{item.get('title', 'Unknown')}' due to missing or invalid AI data")
                     continue
                 
                 # Check if all required AI fields are present
+                # Kiểm tra xem tất cả các trường AI bắt buộc có hiện diện hay không
                 required_fields = ['tldr', 'motivation', 'method', 'result', 'conclusion']
                 if not all(field in ai_data for field in required_fields):
                     print(f"Skipping item '{item.get('title', 'Unknown')}' due to incomplete AI fields")
@@ -58,15 +60,15 @@ if __name__ == "__main__":
                         authors=",".join(item["authors"]),
                         summary=item["summary"],
                         url=item['abs'],
-                        tldr=ai_data.get('tldr', ''),
-                        motivation=ai_data.get('motivation', ''),
-                        method=ai_data.get('method', ''),
-                        result=ai_data.get('result', ''),
-                        conclusion=ai_data.get('conclusion', ''),
+                        tldr=ai_data.get('tldr', '') + '<br/>**VN**: ' + ai_data.get('tldr_vn', ''),
+                        motivation=ai_data.get('motivation', '') + '<br/>**VN**: ' + ai_data.get('motivation_vn', ''),
+                        method=ai_data.get('method', '') + '<br/>**VN**: ' + ai_data.get('method_vn', ''),
+                        result=ai_data.get('result', '') + '<br/>**VN**: ' + ai_data.get('result_vn', ''),
+                        conclusion=ai_data.get('conclusion', '') + '<br/>**VN**: ' + ai_data.get('conclusion_vn', ''),
                         cate=item['categories'][0],
                         idx=next(idx)
                     )
                 )
         markdown += "\n\n".join(papers)
-    with open(args.data.split('_')[0] + '.md', "w") as f:
+    with open(args.data.split('_')[0] + '.md', "w", encoding="utf-8") as f:
         f.write(markdown)

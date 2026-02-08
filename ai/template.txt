@@ -1,4 +1,4 @@
-Please analyze the following abstract of papers. 
+Please analyze the following abstract of papers using the provided Structure with both English and Vietnamese translations. 
 
 Content:
 {content}

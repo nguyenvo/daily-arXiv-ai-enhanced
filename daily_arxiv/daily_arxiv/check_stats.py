@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-检查Scrapy爬取统计信息的脚本 / Script to check Scrapy crawling statistics
-用于获取去重检查的状态结果 / Used to get deduplication check status results
+Script to check Scrapy crawling statistics / Kịch bản kiểm tra số liệu thống kê thu thập thông tin của Scrapy
+Used to get deduplication check status results / Được sử dụng để lấy kết quả trạng thái kiểm tra loại bỏ trùng lặp
 
-功能说明 / Features:
-- 检查当日与昨日论文数据的重复情况 / Check duplication between today's and yesterday's paper data
-- 删除重复论文条目，保留新内容 / Remove duplicate papers, keep new content
-- 根据去重后的结果决定工作流是否继续 / Decide workflow continuation based on deduplication results
+Features / Các tính năng:
+- Check duplication between today's and yesterday's paper data / Kiểm tra sự trùng lặp giữa dữ liệu bài báo hôm nay và hôm qua
+- Remove duplicate papers, keep new content / Loại bỏ các mục bài báo trùng lặp, giữ lại nội dung mới
+- Decide workflow continuation based on deduplication results / Quyết định tiếp tục quy trình làm việc dựa trên kết quả loại bỏ trùng lặp
 """
 import json
 import sys
@@ -15,15 +15,15 @@ from datetime import datetime, timedelta
 
 def load_papers_data(file_path):
     """
-    从jsonl文件中加载完整的论文数据
     Load complete paper data from jsonl file
+    Tải dữ liệu bài báo hoàn chỉnh từ tệp jsonl
     
     Args:
-        file_path (str): JSONL文件路径 / JSONL file path
+        file_path (str): JSONL file path / Đường dẫn tập tin JSONL
         
     Returns:
-        list: 论文数据列表 / List of paper data
-        set: 论文ID集合 / Set of paper IDs
+        list: List of paper data / Danh sách dữ liệu bài báo
+        set: Set of paper IDs / Tập hợp ID bài báo
     """
     if not os.path.exists(file_path):
         return [], set()
@@ -44,12 +44,12 @@ def load_papers_data(file_path):
 
 def save_papers_data(papers, file_path):
     """
-    保存论文数据到jsonl文件
     Save paper data to jsonl file
+    Lưu dữ liệu bài báo vào tệp jsonl
     
     Args:
-        papers (list): 论文数据列表 / List of paper data
-        file_path (str): 文件路径 / File path
+        papers (list): List of paper data / Danh sách dữ liệu bài báo
+        file_path (str): File path / Đường dẫn tập tin
     """
     try:
         with open(file_path, 'w', encoding='utf-8') as f:
@@ -62,33 +62,33 @@ def save_papers_data(papers, file_path):
 
 def perform_deduplication():
     """
-    执行多日去重：删除与历史多日重复的论文条目，保留新内容
     Perform deduplication over multiple past days
+    Thực hiện loại bỏ trùng lặp trong nhiều ngày qua: xóa các mục bài báo trùng lặp với lịch sử nhiều ngày, giữ lại nội dung mới
     
     Returns:
-        str: 去重状态 / Deduplication status
-             - "has_new_content": 有新内容 / Has new content
-             - "no_new_content": 无新内容 / No new content  
-             - "no_data": 无数据 / No data
-             - "error": 处理错误 / Processing error
+        str: Deduplication status / Trạng thái loại bỏ trùng lặp
+             - "has_new_content": Has new content / Có nội dung mới
+             - "no_new_content": No new content / Không có nội dung mới
+             - "no_data": No data / Không có dữ liệu
+             - "error": Processing error / Lỗi xử lý
     """
 
     today = datetime.now().strftime("%Y-%m-%d")
     today_file = f"../data/{today}.jsonl"
-    history_days = 7  # 向前追溯几天的数据进行对比
+    history_days = 7  # Compare data from past few days / So sánh dữ liệu từ vài ngày trước
 
     if not os.path.exists(today_file):
-        print("今日数据文件不存在 / Today's data file does not exist", file=sys.stderr)
+        print("Today's data file does not exist / Tệp dữ liệu hôm nay không tồn tại", file=sys.stderr)
         return "no_data"
 
     try:
         today_papers, today_ids = load_papers_data(today_file)
-        print(f"今日论文总数: {len(today_papers)} / Today's total papers: {len(today_papers)}", file=sys.stderr)
+        print(f"Today's total papers: {len(today_papers)} / Tổng số bài báo hôm nay: {len(today_papers)}", file=sys.stderr)
 
         if not today_papers:
             return "no_data"
 
-        # 收集历史多日 ID 集合
+        # Collect historical multi-day ID set / Thu thập tập hợp ID lịch sử nhiều ngày
         history_ids = set()
         for i in range(1, history_days + 1):
             date_str = (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d")
@@ -96,69 +96,69 @@ def perform_deduplication():
             _, past_ids = load_papers_data(history_file)
             history_ids.update(past_ids)
 
-        print(f"历史{history_days}日去重库大小: {len(history_ids)} / History {history_days} days deduplication library size: {len(history_ids)}", file=sys.stderr)
+        print(f"History {history_days} days deduplication library size: {len(history_ids)} / Kích thước thư viện loại bỏ trùng lặp lịch sử {history_days} ngày: {len(history_ids)}", file=sys.stderr)
 
         duplicate_ids = today_ids & history_ids
 
         if duplicate_ids:
-            print(f"发现 {len(duplicate_ids)} 篇历史重复论文 / Found {len(duplicate_ids)} historical duplicate papers", file=sys.stderr)
+            print(f"Found {len(duplicate_ids)} historical duplicate papers / Đã tìm thấy {len(duplicate_ids)} bài báo trùng lặp lịch sử", file=sys.stderr)
             new_papers = [paper for paper in today_papers if paper.get('id', '') not in duplicate_ids]
 
-            print(f"去重后剩余论文数: {len(new_papers)} / Remaining papers after deduplication: {len(new_papers)}", file=sys.stderr)
+            print(f"Remaining papers after deduplication: {len(new_papers)} / Số bài báo còn lại sau khi loại bỏ trùng lặp: {len(new_papers)}", file=sys.stderr)
 
             if new_papers:
                 if save_papers_data(new_papers, today_file):
-                    print(f"已更新今日文件，移除 {len(duplicate_ids)} 篇重复论文 / Today's file updated, removed {len(duplicate_ids)} duplicate papers", file=sys.stderr)
+                    print(f"Today's file updated, removed {len(duplicate_ids)} duplicate papers / Đã cập nhật tệp hôm nay, đã xóa {len(duplicate_ids)} bài báo trùng lặp", file=sys.stderr)
                     return "has_new_content"
                 else:
-                    print("保存去重后的数据失败 / Failed to save deduplicated data", file=sys.stderr)
+                    print("Failed to save deduplicated data / Lưu dữ liệu sau khi loại bỏ trùng lặp thất bại", file=sys.stderr)
                     return "error"
             else:
                 try:
                     os.remove(today_file)
-                    print("所有论文均为重复内容，已删除今日文件 / All papers are duplicate content, today's file deleted", file=sys.stderr)
+                    print("All papers are duplicate content, today's file deleted / Tất cả nội dung đều là trùng lặp, tệp hôm nay đã bị xóa", file=sys.stderr)
                 except Exception as e:
-                    print(f"删除文件失败: {e} / Failed to delete file: {e}", file=sys.stderr)
+                    print(f"Failed to delete file: {e} / Lỗi khi xóa tệp: {e}", file=sys.stderr)
                 return "no_new_content"
         else:
-            print("所有内容均为新内容 / All content is new", file=sys.stderr)
+            print("All content is new / Tất cả nội dung đều là mới", file=sys.stderr)
             return "has_new_content"
 
     except Exception as e:
-        print(f"去重处理失败: {e} / Deduplication processing failed: {e}", file=sys.stderr)
+        print(f"Deduplication processing failed: {e} / Quá trình loại bỏ trùng lặp thất bại: {e}", file=sys.stderr)
         return "error"
 
 def main():
     """
-    检查去重状态并返回相应的退出码
     Check deduplication status and return corresponding exit code
+    Kiểm tra trạng thái loại bỏ trùng lặp và trả về mã thoát tương ứng
     
-    退出码含义 / Exit code meanings:
-    0: 有新内容，继续处理 / Has new content, continue processing
-    1: 无新内容，停止工作流 / No new content, stop workflow
-    2: 处理错误 / Processing error
+    Exit code meanings / Ý nghĩa mã thoát:
+    0: Has new content, continue processing / Có nội dung mới, tiếp tục xử lý
+    1: No new content, stop workflow / Không có nội dung mới, dừng quy trình làm việc
+    2: Processing error / Lỗi xử lý
     """
     
-    print("正在执行去重检查... / Performing intelligent deduplication check...", file=sys.stderr)
+    print("Performing intelligent deduplication check... / Đang thực hiện kiểm tra loại bỏ trùng lặp thông minh...", file=sys.stderr)
     
-    # 执行去重处理 / Perform deduplication processing
+    # Perform deduplication processing / Thực hiện quy trình loại bỏ trùng lặp
     dedup_status = perform_deduplication()
     
     if dedup_status == "has_new_content":
-        print("✅ 去重完成，发现新内容，继续工作流 / Deduplication completed, new content found, continue workflow", file=sys.stderr)
+        print("✅ Deduplication completed, new content found, continue workflow / Đã hoàn thành loại bỏ trùng lặp, tìm thấy nội dung mới, tiếp tục quy trình làm việc", file=sys.stderr)
         sys.exit(0)
     elif dedup_status == "no_new_content":
-        print("⏹️ 去重完成，无新内容，停止工作流 / Deduplication completed, no new content, stop workflow", file=sys.stderr)
+        print("⏹️ Deduplication completed, no new content, stop workflow / Đã hoàn thành loại bỏ trùng lặp, không có nội dung mới, dừng quy trình làm việc", file=sys.stderr)
         sys.exit(1)
     elif dedup_status == "no_data":
-        print("⏹️ 今日无数据，停止工作流 / No data today, stop workflow", file=sys.stderr)
+        print("⏹️ No data today, stop workflow / Hôm nay không có dữ liệu, dừng quy trình làm việc", file=sys.stderr)
         sys.exit(1)
     elif dedup_status == "error":
-        print("❌ 去重处理出错，停止工作流 / Deduplication processing error, stop workflow", file=sys.stderr)
+        print("❌ Deduplication processing error, stop workflow / Lỗi xử lý loại bỏ trùng lặp, dừng quy trình làm việc", file=sys.stderr)
         sys.exit(2)
     else:
-        # 意外情况：未知状态 / Unexpected case: unknown status
-        print("❌ 未知去重状态，停止工作流 / Unknown deduplication status, stop workflow", file=sys.stderr)
+        # Unexpected case: unknown status / Tình huống bất ngờ: trạng thái không xác định
+        print("❌ Unknown deduplication status, stop workflow / Trạng thái loại bỏ trùng lặp không xác định, dừng quy trình làm việc", file=sys.stderr)
         sys.exit(2)
 
 if __name__ == "__main__":
