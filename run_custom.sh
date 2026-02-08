@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Ensure we are in the flake environment if available
+if [ -f "flake.nix" ] && [ -z "$IN_NIX_SHELL" ]; then
+    echo "Entering Nix shell..."
+    nix develop --command bash "$0" "$@"
+    exit $?
+fi
+
 # Environment Setup
 export LANGUAGE="English" # We handle bilingual inside the prompt manually now / Chúng tôi xử lý song ngữ bên trong lời nhắc theo cách thủ công ngay bây giờ
 export CATEGORIES="cs.CL,cs.AI,cs.MA,cs.LG"
