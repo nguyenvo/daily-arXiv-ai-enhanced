@@ -16,10 +16,10 @@ systemd.user.services.daily-paper-feed = {
   Service = {
     Type = "oneshot";
     # Point this to your repository path
-    WorkingDirectory = "/home/yourusername/path/to/daily_paper_feed";
+    WorkingDirectory = "/home/nguyen/daily-arXiv-ai-enhanced";
     # Ensure all required environment variables are set here or in the script
     Environment = [
-      "PATH=/run/current-system/sw/bin:/home/yourusername/.nix-profile/bin"
+      "PATH=/run/current-system/sw/bin:/home/nguyen/.nix-profile/bin"
       "GOOGLE_API_KEY=your_api_key_here"  # Or load from a file/sops-nix
       "EMAIL_SENDER=your_email@gmail.com"
       "EMAIL_PASSWORD=your_app_password"
@@ -84,3 +84,5 @@ To enable the email feature, you must set:
 - `EMAIL_SENDER`: Your email address (e.g., `user@gmail.com`).
 - `EMAIL_PASSWORD`: Your App Password (if using Gmail with 2FA, generate one at https://myaccount.google.com/apppasswords).
 - `EMAIL_RECEIVER`: (Optional) Defaults to sender.
+
+> **Note on Gmail**: This script uses **SMTP** to send emails, not POP3 (which is for receiving and being deprecated). SMTP with App Passwords is fully supported and secure.
