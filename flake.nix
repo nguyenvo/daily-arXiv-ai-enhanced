@@ -31,9 +31,9 @@
           shellHook = ''
             # Create a venv if it doesn't exist for non-nixpkgs deps
             if [ ! -d ".venv" ]; then
-              python -m venv .venv
+              python -m venv --system-site-packages .venv
               source .venv/bin/activate
-              pip install langchain-google-genai langchain arxiv
+              pip install langchain-google-genai langchain arxiv python-dotenv
             else
               source .venv/bin/activate
             fi
