@@ -20,6 +20,7 @@
               python-dotenv
               markdown
               tqdm
+              arxiv
               pip
               virtualenv
             ]))
