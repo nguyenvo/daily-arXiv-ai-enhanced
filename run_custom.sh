@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ensure we are in the flake environment if available
 if [ -f "flake.nix" ] && [ -z "$IN_NIX_SHELL" ]; then
