@@ -52,16 +52,14 @@ systemd.services.daily-paper-feed = {
   description = "Daily Arxiv Paper Feed Generator";
   serviceConfig = {
     Type = "oneshot";
-    User = "yourusername";
-    WorkingDirectory = "/home/yourusername/path/to/daily_paper_feed";
+    User = "nguyen";
+    WorkingDirectory = "/home/nguyen/daily-arXiv-ai-enhanced";
     ExecStart = "${pkgs.bash}/bin/bash ./run_custom.sh";
   };
-  environment = {
     GOOGLE_API_KEY = "your_api_key_here";
     EMAIL_SENDER = "your_email@gmail.com";
     EMAIL_PASSWORD = "your_app_password";
     EMAIL_RECEIVER = "your_email@gmail.com";
-  };
 };
 
 systemd.timers.daily-paper-feed = {
@@ -86,3 +84,40 @@ To enable the email feature, you must set:
 - `EMAIL_RECEIVER`: (Optional) Defaults to sender.
 
 > **Note on Gmail**: This script uses **SMTP** to send emails, not POP3 (which is for receiving and being deprecated). SMTP with App Passwords is fully supported and secure.
+
+## Verification
+
+After applying your NixOS configuration (`nixos-rebuild switch` or `home-manager switch`), you can verify the installation with these commands:
+
+### 1. Check if the Timer is Active
+```bash
+# If using Home Manager
+systemctl --user list-timers --all | grep daily-paper-feed
+
+# If using System Config
+systemctl list-timers --all | grep daily-paper-feed
+```
+You should see `daily-paper-feed.timer` listed with the next execution time.
+
+### 2. Manually Trigger the Service
+You don't have to wait for 8 AM to test it. You can start the service manually:
+
+```bash
+# If using Home Manager
+systemctl --user start daily-paper-feed
+
+# If using System Config
+sudo systemctl start daily-paper-feed
+```
+
+### 3. Check Logs
+After starting it, check the logs to see if it's running successfully or if there are errors (like API keys or paths):
+
+```bash
+# If using Home Manager
+journalctl --user -u daily-paper-feed -f
+
+# If using System Config
+sudo journalctl -u daily-paper-feed -f
+```
+
